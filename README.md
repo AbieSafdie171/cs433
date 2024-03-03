@@ -5,10 +5,11 @@
 
 ## How to Run:
 	
-	In terminal:
+In terminal:
 	
-`make all`
-`sudo ./keylog`
+	`make all`
+
+	`sudo ./keylog`
 
 Enter the number of inputs you want to be encrypted and then start typing! 
 After you complete all of your inputs, will the encrypted letters appear in whatever text box you started typing into.
