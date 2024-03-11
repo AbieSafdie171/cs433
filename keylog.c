@@ -5,36 +5,49 @@
 #include <linux/input.h>
 #include <sys/ioctl.h>
 #include <string.h>
+#include <stdint.h>
 
 
 
-void setInputKey(struct input_event *event, int type, int code, int value){
+void setInputKey(struct input_event *event, __u16 type, __u16 code, __s32 value){
 
 
 	memset(event, 0, sizeof(struct input_event));
-
+	// printf("int code: %d\n", code);
 	event->type = type;
 	event->code = code;
 	event->value = value;
 
 }
 
-int main(){
+int main(int argc, char *argv[]){
 
 	FILE *output_f;	
 	output_f = fopen("log.txt", "w");
 	fprintf(output_f, "Keys Pressed: \n");
 
 	int num_input;
+	int ne = 0;
+	int de = 0;
+
+	
+	if (strcmp(argv[1], "-noencrypt") == 0){
+	
+		ne = 1;
+
+	} else if (strcmp(argv[1], "-nodecrypt") == 0){
+	
+		de = 1;
+	}
+	
 
 	while (1){
 
 		printf("Enter Number of Inputs you want to encrypt, '0' to exit program: ");
 		scanf("%d", &num_input);
-
-		// struct input_event *input_arr = (struct input_event *)malloc(sizeof(struct input_event) * num_input);
-
-		int *input_arr = (int *)malloc(sizeof(int) * num_input);
+		
+		fflush(stdin);
+		__u16 *input_arr = (__u16 *)malloc(sizeof(__u16) * num_input);
 
 
 		sleep(1);
@@ -73,17 +86,16 @@ int main(){
 					break;
 				}
 
-				// fprintf(stderr, "ev.value: [%d] | ev.code: [%d]\n", ev.value, ev.code);
-
 				if (ev.type == EV_KEY && ev.value == 1){
 					fprintf(output_f, "%d ", ev.code);
 					fflush(output_f);
 					num_input--;
 
+					// printf("[%zu]\n", sizeof(ev.code));
+
 					input_arr[idx] = ev.code;
+					printf("saving %d\n", input_arr[idx]);
 					idx++;
-					// sleep(1);
-					//fprintf(stderr, "itow.value: [%d] | itow.code: [%d]\n", itow.value, itow.code);
 					if (num_input == 0)
 						break;
 
@@ -98,15 +110,14 @@ int main(){
 				return -1;
 			}
 			close(fd);
-			fflush(stdout);
-			fflush(stderr);	
+			// fflush(stdout);
+			// fflush(stderr);	
 			fprintf(stderr, "keyboard released.\n");
 		
 		}
-		
 		struct input_event itow;
 		int fd_write;
-		fd_write = open("/dev/input/event3", O_WRONLY);
+		fd_write = open("/dev/input/event3", O_RDWR);
 		for (int i = 0; i < idx; ++i){
 	
 			// TODO: REPLACE 'KEY_A' WITH THE ENCRYPTED KEY
@@ -131,21 +142,34 @@ int main(){
 				// Won't work with capital letters
 					// CAPS LOCK/SHIFT have their specific values however, so it would really just be handled
 					// in the decryption phase, so we shouldnt worry about it now?	
-			
-			setInputKey(&itow, EV_KEY, KEY_A, 1);
-			write(fd_write, &itow, sizeof(struct input_event));
-			setInputKey(&itow, EV_KEY, KEY_A, 0);
-			write(fd_write, &itow, sizeof(struct input_event));
+			if (ne == 1){
 
+
+				// printf("[%d]\n", KEY_A);
+				//
+				// unsigned const int o = 18;
+				__u16 a = KEY_A;
+				__u16 ob = KEY_O;
+				__u16 ta = 30;		
+
+				//printf("[%u]\n", ob);
+				//printf("input_arr[%d] = %u\n", i, input_arr[i]);	
+				
+				setInputKey(&itow, EV_KEY, input_arr[i], 1);
+				write(fd_write, &itow, sizeof(struct input_event));
+				setInputKey(&itow, EV_KEY, input_arr[i], 0);
+				write(fd_write, &itow, sizeof(struct input_event));
+				// fsync(fd_write);
+			}
 		
 		}
-		close(fd_write);
+		// fsync(fd_write);
+		fflush(stdin);
 		free(input_arr);
-
+		
 	}
-	
+
 	fclose(output_f);
-	
 
 	return 0;
 	
