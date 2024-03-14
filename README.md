@@ -5,7 +5,7 @@
 
 ## How to Run:
 	
-In terminal:
+In terminal, ideally on an Ubuntu VM:
 
 `make all`
 
