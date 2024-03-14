@@ -6,13 +6,14 @@
 ## How to Run:
 	
 In terminal:
+
 `make all`
 
 `sudo ./keylog`
 
 `sudo ./keylog -encrypt`
 
-Note: This works by grabbing and capturing inputs by an IO input device. They keyboard on the machine we were worked on was: /dev/input/event3
+Note: This works by grabbing and capturing inputs by an IO input device. The keyboard on the machine we were worked on was: /dev/input/event3
 
 This will most likely vary machine by machine. So this value will have to changed.
 
