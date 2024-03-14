@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
         en = 1; // Set no decryption flag
     }
     start:
-    printf("ne = %d, en = %d\n", ne, en);
+    // printf("ne = %d, en = %d\n", ne, en);
     // Main loop to capture user input
     while (1) {
         // Prompt user to enter number of inputs
